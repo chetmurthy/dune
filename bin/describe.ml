@@ -721,8 +721,9 @@ module Format = struct
   type t =
     | Sexp
     | Csexp
+    | Json
 
-  let all = [ ("sexp", Sexp); ("csexp", Csexp) ]
+  let all = [ ("sexp", Sexp); ("csexp", Csexp); ("json", Json) ]
 
   let arg =
     let doc = Printf.sprintf "$(docv) must be %s" (Arg.doc_alts_enum all) in
@@ -814,6 +815,8 @@ let term : unit Term.t =
       | Ok (Some res) -> (
         match format with
         | Csexp -> Csexp.to_channel stdout (Sexp.of_dyn res)
-        | Sexp -> print_as_sexp res))
+        | Sexp -> print_as_sexp res
+        | Json -> Dyn.pp_as_yojson res
+    ))
 
 let command : unit Term.t * Term.info = (term, info)

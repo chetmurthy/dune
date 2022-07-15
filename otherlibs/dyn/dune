@@ -1,3 +1,6 @@
+(env
+  (dev
+    (flags (:standard -warn-error -27))))
 (library
  (public_name dyn)
- (libraries pp ordering))
+ (libraries yojson pp ordering))

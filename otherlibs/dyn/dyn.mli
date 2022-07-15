@@ -70,3 +70,6 @@ val opaque : _ builder
 val record : (string * t) list -> t
 
 val variant : string -> t list -> t
+
+val pp_as_yojson : t -> unit
+                                                             

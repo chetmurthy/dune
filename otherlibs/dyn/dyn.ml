@@ -161,3 +161,30 @@ let hash = Stdlib.Hashtbl.hash
 let compare x y = Ordering.of_int (compare x y)
 
 let equal x y = x = y
+
+let rec to_yojson = function
+  | Opaque -> `String"Opaque"
+  | Unit -> `Null
+  | Int n -> `Int n
+  | Int32 n  -> `Int (Int32.to_int n)
+  | Int64 n -> `String (Int64.to_string n)
+  | Nativeint n -> `Int (Nativeint.to_int n)
+  | Bool b -> `Bool b
+  | String s -> `String s
+  | Bytes b -> `String (Bytes.to_string b)
+  | Char c -> `String (String.make 1 c)
+  | Float f -> `Float f
+  | Option None -> `Null
+  | Option (Some t) -> to_yojson t
+  | List l -> `List (List.map ~f:to_yojson l)
+  | Array l -> `List (List.map ~f:to_yojson (Array.to_list l))
+  | Tuple l -> `List (List.map ~f:to_yojson l)
+  | Record m -> `Assoc(List.map ~f:(fun (k,v) -> (k, to_yojson v)) m)
+  | Variant (n, l) -> `List((`String n)::(List.map ~f:to_yojson l))
+  | Map pl -> `List(List.map ~f:(fun (a,b) -> `List[to_yojson a; to_yojson b]) pl)
+  | Set l ->  `List(List.map ~f:to_yojson l)
+
+let pp_as_yojson x =
+  let json = to_yojson x in
+  Yojson.Basic.pretty_print Format.std_formatter json ;
+  Format.(pp_print_flush std_formatter ())
